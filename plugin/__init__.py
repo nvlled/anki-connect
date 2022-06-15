@@ -871,6 +871,41 @@ class AnkiConnect:
         return couldSetEaseFactors
 
     @util.api()
+    def answerCards(self, cards, buttons, elapses=None):
+        if self.guiReviewActive():
+            raise Exception('Gui review must not be active.')
+
+        elapses = elapses or []
+
+        def getElem(array, idx):
+            if idx >= 0 and idx < len(array):
+                return array[idx]
+            return None
+
+        couldAnswer = [False] * len(cards)
+        cardGroups = {}
+        for i, card in enumerate(cards):
+            try:
+                ankiCard = self.getCard(card)
+                ankiCard.timer_started = time.time() - (getElem(elapses, i) or 0)
+            except NotFoundError:
+                continue
+
+            if ankiCard.did not in cardGroups:
+                cardGroups[ankiCard.did] = []
+            cardGroups[ankiCard.did].append((ankiCard, i))
+
+        col = self.collection()
+        for deckId, ankiCards in cardGroups.items():
+            col.decks.select(deckId)
+            for ankiCard, i in ankiCards:
+                button =  getElem(buttons, i) or 3 # use "Good" by default
+                col.sched.answerCard(ankiCard, buttons[i])
+                couldAnswer[i] = True
+
+        return couldAnswer
+
+    @util.api()
     def setSpecificValueOfCard(self, card, keys,
                                newValues, warning_check=False):
         if isinstance(card, list):

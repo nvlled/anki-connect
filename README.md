@@ -238,6 +238,36 @@ corresponding to when the API was available for use.
     }
     ```
 
+*   **answerCards**
+
+    Answers the cards with the given button answers. This is similar to `guiAnswerCard`, but
+    without affecting the gui. The `buttons` take the following values: 1 (again), 2 (hard), 3 (good), 4 (easy).
+    `elapses` are optional, they are the number of seconds it took the answer the card.
+
+    Returns `true` if successful or `false` for each card result.
+    Returns an `error` if anki is in review mode.
+
+    *Sample request*:
+    ```json
+    {
+        "action": "answerCards",
+        "version": 6,
+        "params": {
+            "cards": [1483959291685, 1483959293217],
+            "buttons": [3, 2],
+            "elapses": [1.5, 2]
+        }
+    }
+    ```
+
+    *Sample result*:
+    ```json
+    {
+        "result": [true, true],
+        "error": null
+    }
+    ```
+
 
 *   **setSpecificValueOfCard**
 
